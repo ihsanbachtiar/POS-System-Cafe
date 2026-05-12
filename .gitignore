@@ -1,0 +1,22 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+.env
+
+# Vite / React
+dist/
+dist-ssr/
+*.local
+
+# System
+.DS_Store
+.vscode/
+
+# Database
+*.sqlite
+*.sqlite3
+
+# Ignore unused raw design folders
+stitch_luxe_brew_pos/
+stitch_luxe_brew_pos 2/
