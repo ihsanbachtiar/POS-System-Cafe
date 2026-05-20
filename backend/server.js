@@ -129,7 +129,30 @@ app.get('/api/transactions', async (req, res) => {
       JOIN users u ON t.user_id = u.id
       ORDER BY t.created_at DESC
     `);
+    
+    // Fetch items for each transaction so the frontend receipt can use it
+    for (let tx of rows) {
+      const [items] = await db.query(`
+        SELECT ti.*, m.name 
+        FROM transaction_items ti 
+        JOIN menu m ON ti.menu_id = m.id 
+        WHERE ti.transaction_id = ?
+      `, [tx.id]);
+      tx.items = items;
+    }
+    
     res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/transactions/:id/status', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  try {
+    await db.query('UPDATE transactions SET status = ? WHERE id = ?', [status, id]);
+    res.json({ success: true, message: 'Status updated' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

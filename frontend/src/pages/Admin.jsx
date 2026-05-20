@@ -84,6 +84,15 @@ function Admin() {
     navigate('/login');
   };
 
+  const handleUpdateStatus = async (id, newStatus) => {
+    try {
+      await axios.put(`http://localhost:5001/api/transactions/${id}/status`, { status: newStatus });
+      fetchData(); // Refresh data
+    } catch (err) {
+      alert('Gagal mengupdate status');
+    }
+  };
+
   const renderContent = () => {
     if (activeTab === 'menu') {
       return (
@@ -159,7 +168,7 @@ function Admin() {
     } else if (activeTab === 'reports') {
       return (
         <div className="flex-1 overflow-y-auto pb-24 lg:pb-6">
-          <h2 className="font-headline-lg text-2xl font-bold mb-6 text-on-surface dark:text-on-primary">Laporan Penjualan</h2>
+          <h2 className="font-headline-lg text-2xl font-bold mb-6 text-on-surface dark:text-on-primary">Laporan & Status Pesanan</h2>
           <div className="bg-surface-container-lowest dark:bg-surface-container rounded-lg border border-outline-variant dark:border-outline shadow-[0px_4px_12px_rgba(31,21,18,0.05)] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -170,6 +179,7 @@ function Admin() {
                     <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant dark:text-outline-variant uppercase tracking-wider font-semibold">Kasir</th>
                     <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant dark:text-outline-variant uppercase tracking-wider font-semibold">Total</th>
                     <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant dark:text-outline-variant uppercase tracking-wider font-semibold">Pembayaran</th>
+                    <th className="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant dark:text-outline-variant uppercase tracking-wider font-semibold">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline-variant dark:divide-outline">
@@ -177,14 +187,28 @@ function Admin() {
                     <tr key={tx.id} className="hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors cursor-default dark:bg-surface-container">
                       <td className="px-6 py-4 font-body-md text-on-surface dark:text-on-primary">#{tx.id}</td>
                       <td className="px-6 py-4 font-body-md text-on-surface dark:text-on-primary">{new Date(tx.created_at).toLocaleString()}</td>
-                      <td className="px-6 py-4 font-body-md text-on-surface dark:text-on-primary">{tx.user_id}</td>
+                      <td className="px-6 py-4 font-body-md text-on-surface dark:text-on-primary">{tx.cashier_name}</td>
                       <td className="px-6 py-4 font-body-md font-semibold text-primary dark:text-primary-fixed-dim">Rp {parseFloat(tx.total).toLocaleString('id-ID')}</td>
                       <td className="px-6 py-4 font-body-md text-on-surface dark:text-on-primary capitalize">{tx.payment_type}</td>
+                      <td className="px-6 py-4">
+                        <select 
+                          value={tx.status} 
+                          onChange={(e) => handleUpdateStatus(tx.id, e.target.value)}
+                          className={`px-3 py-1 rounded-full text-sm font-semibold border-none outline-none cursor-pointer
+                            ${tx.status === 'pending' ? 'bg-error-container text-on-error-container' : 
+                              tx.status === 'proses' ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 
+                              'bg-primary-container text-on-primary-container dark:bg-primary-fixed dark:text-on-primary-fixed'}`}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="proses">Proses</option>
+                          <option value="selesai">Selesai</option>
+                        </select>
+                      </td>
                     </tr>
                   ))}
                   {transactions.length === 0 && (
                     <tr>
-                      <td colSpan="5" className="px-6 py-8 text-center text-on-surface-variant dark:text-outline-variant font-body-md">Belum ada transaksi</td>
+                      <td colSpan="6" className="px-6 py-8 text-center text-on-surface-variant dark:text-outline-variant font-body-md">Belum ada transaksi</td>
                     </tr>
                   )}
                 </tbody>

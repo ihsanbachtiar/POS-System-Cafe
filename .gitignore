@@ -20,3 +20,8 @@ dist-ssr/
 # Ignore unused raw design folders
 stitch_luxe_brew_pos/
 stitch_luxe_brew_pos 2/
+
+# Ignore bukti folder
+bukti/
+BUKTI/
+
